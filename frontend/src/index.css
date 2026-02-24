@@ -1,0 +1,68 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   src/index.css  –  Global styles + Tailwind directives
+   ──────────────────────────────────────────────────────────────────────── */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Custom scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #3a3a44;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4f46e5;
+}
+
+/* ── Base resets ───────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  background-color: #0d0d0f;
+  color: #f1f1f3;
+}
+
+/* ── Utility: glass card ───────────────────────────────────────────────── */
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 
+           bg-brand-600 hover:bg-brand-700 active:scale-95 
+           text-white font-semibold rounded-xl 
+           transition-all duration-200 cursor-pointer select-none
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-surface-900;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2
+           text-sm text-gray-400 hover:text-white hover:bg-white/10
+           rounded-lg transition-all duration-150 cursor-pointer;
+  }
+
+  .input-field {
+    @apply w-full bg-surface-700 border border-surface-500 
+           text-white placeholder-gray-500 rounded-xl px-4 py-3 
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           transition-all duration-150 resize-none;
+  }
+}
