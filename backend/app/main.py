@@ -64,7 +64,7 @@ app = FastAPI(
 
 origins = [
     "http://localhost:5173",  # local frontend
-    os.getenv("FRONTEND_URL")  # production frontend
+    "https://context-contol.vercel.app/"
 ]
 
 app.add_middleware(
