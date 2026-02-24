@@ -53,6 +53,23 @@ app = FastAPI(
     redoc_url="/redoc", # ReDoc UI
 )
 
+
+from fastapi.middleware.cors import CORSMiddleware
+
+# List all allowed origins (Your Vercel URL + Localhost for testing)
+origins = [
+    "https://your-app-name.vercel.app",  # Your production Vercel URL
+    "http://localhost:3000",             # Your local React dev port
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # ── CORS ──────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
