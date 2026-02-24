@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str  # postgresql+asyncpg://...
 
     # ── CORS ─────────────────────────────────────────────────────────────
-    FRONTEND_URL: str = "http://localhost:5173"
+    # FRONTEND_URL: str = "http://localhost:5173"
+    FRONTEND_URL: str = "https://context-contol-5daixa2xw-shovanpaul48s-projects.vercel.app"    
 
     model_config = SettingsConfigDict(
         env_file=".env",
