@@ -53,13 +53,26 @@ app = FastAPI(
     redoc_url="/redoc", # ReDoc UI
 )
 
-# ── CORS ──────────────────────────────────────────────────────────────────────
+# # ── CORS ──────────────────────────────────────────────────────────────────────
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[settings.FRONTEND_URL],  # Never use ["*"] in production
+#     allow_credentials=True,
+#     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+#     allow_headers=["Authorization", "Content-Type"],
+# )
+
+origins = [
+    "http://localhost:5173",  # local frontend
+    os.getenv("FRONTEND_URL")  # production frontend
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL],  # Never use ["*"] in production
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ── Routers ───────────────────────────────────────────────────────────────────
