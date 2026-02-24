@@ -9,7 +9,8 @@ export default defineConfig({
     // Proxy API calls to backend during development — avoids CORS issues
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        // target: 'http://localhost:8000',
+        target: 'https://contextcontol.onrender.com',
         changeOrigin: true,
         secure: false,
       },

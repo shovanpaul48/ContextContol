@@ -85,3 +85,14 @@ app.include_router(chat_router, prefix="/api/v1")
 async def health_check():
     """Returns 200 OK — used by load balancers / uptime monitors."""
     return {"status": "ok", "app": settings.APP_NAME}
+
+
+
+@app.get("/")
+def root():
+    return {"status": "ok"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
