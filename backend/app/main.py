@@ -53,15 +53,26 @@ app = FastAPI(
     redoc_url="/redoc", # ReDoc UI
 )
 
-# ── CORS ──────────────────────────────────────────────────────────────────────
+# # ── CORS ──────────────────────────────────────────────────────────────────────
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=[settings.FRONTEND_URL],  # Never use ["*"] in production
+#     allow_credentials=True,
+#     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+#     allow_headers=["Authorization", "Content-Type"],
+# )
+
+origins = [
+    "http://localhost:5173",  # local frontend
+    "https://context-contol-5daixa2xw-shovanpaul48s-projects.vercel.app"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL],  # Never use ["*"] in production
+    allow_origins=origins,
     allow_credentials=True,
-    # allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    # allow_headers=["Authorization", "Content-Type"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # ── Routers ───────────────────────────────────────────────────────────────────
@@ -74,3 +85,14 @@ app.include_router(chat_router, prefix="/api/v1")
 async def health_check():
     """Returns 200 OK — used by load balancers / uptime monitors."""
     return {"status": "ok", "app": settings.APP_NAME}
+
+
+
+@app.get("/")
+def root():
+    return {"status": "ok"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
