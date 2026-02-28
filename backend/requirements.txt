@@ -26,3 +26,6 @@ email-validator==2.1.1
 # Utilities
 python-dotenv==1.0.1
 python-multipart==0.0.9
+
+# LLM Providers — OpenAI-compatible client (works with OpenRouter, Groq, Nvidia NIM)
+openai>=1.0.0

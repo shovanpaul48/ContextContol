@@ -26,8 +26,12 @@ class Settings(BaseSettings):
     DATABASE_URL: str  # postgresql+asyncpg://...
 
     # ── CORS ─────────────────────────────────────────────────────────────
-    # FRONTEND_URL: str = "http://localhost:5173"
-    FRONTEND_URL: str = "https://context-contol.vercel.app/"
+    FRONTEND_URL: str = "http://localhost:5173"
+
+    # ── AI Providers ──────────────────────────────────────────────────────
+    OPENROUTER_API_KEY: str = ""  # Required for OpenRouter provider
+    GROQ_API_KEY: str = ""        # Uncomment when adding Groq
+    NVIDIA_API_KEY: str = ""      # Uncomment when adding Nvidia NIM
 
     model_config = SettingsConfigDict(
         env_file=".env",

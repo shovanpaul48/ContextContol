@@ -2,8 +2,11 @@
  * components/ChatMessage.jsx
  * ──────────────────────────
  * Renders a single chat message bubble.
- * User messages → right-aligned indigo bubble
- * Assistant messages → left-aligned gray bubble (Phase 2)
+ *
+ * Phase 2 additions:
+ *  - Typing indicator (animated dots) for optimistic assistant messages
+ *  - Assistant avatar shows AI label
+ *  - Support for isTyping prop
  */
 
 import { useAuth } from '../context/AuthContext'
@@ -19,14 +22,28 @@ function formatTime(isoString) {
     })
 }
 
+/** Animated typing dots shown while the LLM is generating a response */
+function TypingIndicator() {
+    return (
+        <div className="flex items-center gap-1 px-4 py-3">
+            {[0, 1, 2].map((i) => (
+                <span
+                    key={i}
+                    className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                    style={{ animationDelay: `${i * 0.15}s` }}
+                />
+            ))}
+        </div>
+    )
+}
+
 export default function ChatMessage({ message }) {
     const { user } = useAuth()
     const isUser = message.role === 'user'
 
     return (
         <div
-            className={`flex items-end gap-3 animate-slide-up ${isUser ? 'flex-row-reverse' : 'flex-row'
-                }`}
+            className={`flex items-end gap-3 animate-slide-up ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
         >
             {/* ── Avatar ──────────────────────────────────────────────────── */}
             <div className="flex-shrink-0">
@@ -51,12 +68,15 @@ export default function ChatMessage({ message }) {
                             : 'bg-surface-700 text-gray-100 rounded-bl-md'
                         }`}
                 >
-                    {message.content}
+                    {message.isTyping ? <TypingIndicator /> : message.content}
                 </div>
-                {/* Timestamp */}
-                <span className="text-xs text-gray-600 px-1">
-                    {formatTime(message.timestamp)}
-                </span>
+
+                {/* Timestamp — hide for typing indicator */}
+                {!message.isTyping && (
+                    <span className="text-xs text-gray-600 px-1">
+                        {formatTime(message.timestamp)}
+                    </span>
+                )}
             </div>
         </div>
     )

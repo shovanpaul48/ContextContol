@@ -33,7 +33,7 @@ apiClient.interceptors.response.use(
             // Token expired or invalid — clear local auth state
             localStorage.removeItem('access_token')
             localStorage.removeItem('user')
-            window.location.href = '/'  // Redirect to login
+            window.location.href = '/'
         }
         return Promise.reject(error)
     }
@@ -52,19 +52,34 @@ export const authApi = {
 // ── Chat API ──────────────────────────────────────────────────────────────
 export const chatApi = {
     /**
-     * Post a new message to the chat.
-     * @param {string} content - Message text
+     * Send a message and receive an LLM response.
+     * @param {string}       content          - Message text
+     * @param {string}       provider         - Provider key (e.g. "openrouter")
+     * @param {string}       model            - Model slug
+     * @param {string|null}  conversationId   - Existing conversation UUID (optional)
      */
-    sendMessage: (content) =>
-        apiClient.post('/chat/message', { content }),
+    sendMessage: (content, provider = 'openrouter', model = 'mistralai/mistral-7b-instruct', conversationId = null) =>
+        apiClient.post('/chat/message', {
+            content,
+            provider,
+            model,
+            ...(conversationId ? { conversation_id: conversationId } : {}),
+        }),
 
     /**
-     * Fetch paginated message history.
-     * @param {number} limit - Max messages (default 100)
-     * @param {number} offset - Pagination offset (default 0)
+     * Fetch paginated message history (legacy — all conversations).
+     * @param {number} limit  - Max messages (default 100)
+     * @param {number} offset - Pagination offset
      */
     getHistory: (limit = 100, offset = 0) =>
         apiClient.get('/chat/history', { params: { limit, offset } }),
+
+    /**
+     * Fetch available providers and their model lists.
+     * Used to populate the ModelSelector dropdowns.
+     */
+    getProviders: () =>
+        apiClient.get('/chat/providers'),
 }
 
 export default apiClient
