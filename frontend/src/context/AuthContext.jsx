@@ -43,7 +43,18 @@ export function AuthProvider({ children }) {
 
             setUser(data.user)
         } catch (err) {
-            const message = err.response?.data?.detail || 'Authentication failed. Please try again.'
+            console.error('Auth error:', err)
+            console.error('Response:', err.response?.status, err.response?.data)
+            const detail = err.response?.data?.detail
+            const status = err.response?.status
+            let message
+            if (detail) {
+                message = `${detail} (${status})`
+            } else if (err.message) {
+                message = `Connection error: ${err.message}`
+            } else {
+                message = 'Authentication failed. Please try again.'
+            }
             setError(message)
             throw err
         } finally {

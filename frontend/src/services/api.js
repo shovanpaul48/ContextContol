@@ -1,19 +1,23 @@
 /**
  * services/api.js
  * ───────────────
- * Centralised Axios instance.
- * - Base URL points to FastAPI via Vite's dev proxy
- * - Automatically attaches JWT from localStorage on every request
- * - Handles 401 by clearing auth state
+ * Centralised Axios instance with reliability improvements.
+ *
+ * Phase 3 additions:
+ *   - Request timeout (35s — slightly above backend's 30s LLM timeout)
+ *   - Conversation-scoped history fetching
+ *   - Retry endpoint
  */
 
 import axios from 'axios'
 
 const API_BASE = '/api/v1'
+const REQUEST_TIMEOUT = 35000  // 35s — backend has 30s LLM timeout
 
 const apiClient = axios.create({
     baseURL: API_BASE,
     headers: { 'Content-Type': 'application/json' },
+    timeout: REQUEST_TIMEOUT,
 })
 
 // ── Request interceptor: attach JWT ───────────────────────────────────────
@@ -30,7 +34,6 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Token expired or invalid — clear local auth state
             localStorage.removeItem('access_token')
             localStorage.removeItem('user')
             window.location.href = '/'
@@ -41,10 +44,6 @@ apiClient.interceptors.response.use(
 
 // ── Auth API ──────────────────────────────────────────────────────────────
 export const authApi = {
-    /**
-     * Exchange Google ID token for backend JWT.
-     * @param {string} idToken - Google ID token from @react-oauth/google
-     */
     googleLogin: (idToken) =>
         apiClient.post('/auth/google', { id_token: idToken }),
 }
@@ -53,10 +52,6 @@ export const authApi = {
 export const chatApi = {
     /**
      * Send a message and receive an LLM response.
-     * @param {string}       content          - Message text
-     * @param {string}       provider         - Provider key (e.g. "openrouter")
-     * @param {string}       model            - Model slug
-     * @param {string|null}  conversationId   - Existing conversation UUID (optional)
      */
     sendMessage: (content, provider = 'openrouter', model = 'mistralai/mistral-7b-instruct', conversationId = null) =>
         apiClient.post('/chat/message', {
@@ -67,16 +62,34 @@ export const chatApi = {
         }),
 
     /**
-     * Fetch paginated message history (legacy — all conversations).
-     * @param {number} limit  - Max messages (default 100)
-     * @param {number} offset - Pagination offset
+     * Retry a failed message.
      */
-    getHistory: (limit = 100, offset = 0) =>
-        apiClient.get('/chat/history', { params: { limit, offset } }),
+    retryMessage: (content, provider, model, conversationId) =>
+        apiClient.post('/chat/retry', {
+            content,
+            provider,
+            model,
+            conversation_id: conversationId,
+        }),
+
+    /**
+     * Fetch message history.
+     * @param {Object} opts
+     * @param {string}  opts.conversationId - Filter by conversation (recommended)
+     * @param {number}  opts.limit
+     * @param {number}  opts.offset
+     */
+    getHistory: ({ conversationId = null, limit = 100, offset = 0 } = {}) =>
+        apiClient.get('/chat/history', {
+            params: {
+                ...(conversationId ? { conversation_id: conversationId } : {}),
+                limit,
+                offset,
+            },
+        }),
 
     /**
      * Fetch available providers and their model lists.
-     * Used to populate the ModelSelector dropdowns.
      */
     getProviders: () =>
         apiClient.get('/chat/providers'),
